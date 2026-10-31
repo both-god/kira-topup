@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Lydalin Topup</title>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#0b132b;--card:#1c2541;--accent:#00b4d8;--bright:#0077b6;--text-gray:#94a3b8;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Kantumruy Pro',sans-serif;}
+body{background:var(--bg);color:#fff;min-height:100vh;display:flex;}
+a{color:inherit;text-decoration:none;}
+.sidebar{width:220px;background:var(--card);border-right:1px solid rgba(0,180,216,.2);padding:1.2rem;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar h2{font-size:1.1rem;margin-bottom:1.5rem;color:var(--accent);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:6px;font-size:.9rem;color:var(--text-gray);}
+.nav-item:hover,.nav-item.active{background:rgba(0,180,216,.15);color:#fff;}
+.main{flex:1;padding:1.5rem;max-width:1100px;overflow-x:auto;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
+.topbar h1{font-size:1.3rem;}
+.btn{background:var(--bright);border:none;color:#fff;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.85rem;}
+.btn:hover{background:var(--accent);}
+.btn-red{background:var(--red);} .btn-green{background:var(--green);} .btn-sm{padding:5px 10px;font-size:.75rem;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:1.5rem;}
+.stat-card{background:var(--card);border:1px solid rgba(0,180,216,.2);border-radius:14px;padding:1rem;}
+.stat-card .label{font-size:.75rem;color:var(--text-gray);margin-bottom:6px;}
+.stat-card .value{font-size:1.5rem;font-weight:700;}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.85rem;}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap;}
+th{background:rgba(0,180,216,.1);color:var(--accent);font-size:.75rem;text-transform:uppercase;}
+tr:hover{background:rgba(255,255,255,.03);}
+.badge{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block;}
+.b-pending{background:rgba(148,163,184,.15);color:#94a3b8;}
+.b-scanned,.b-paid{background:rgba(6,182,212,.15);color:#06b6d4;}
+.b-delivering{background:rgba(59,130,246,.15);color:#3b82f6;}
+.b-completed{background:rgba(16,185,129,.15);color:#10b981;}
+.b-failed,.b-expired,.b-cancelled{background:rgba(239,68,68,.15);color:#ef4444;}
+.filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.filters select,.filters input{background:var(--card);border:1px solid rgba(0,180,216,.3);color:#fff;padding:8px 10px;border-radius:8px;font-size:.85rem;}
+.panel{background:var(--card);border:1px solid rgba(0,180,216,.2);border-radius:14px;padding:1.2rem;margin-bottom:1.2rem;}
+.panel h3{margin-bottom:1rem;font-size:1rem;color:var(--accent);}
+.form-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.form-row input,.form-row select{flex:1;min-width:120px;background:var(--bg);border:1px solid rgba(0,180,216,.3);color:#fff;padding:9px;border-radius:8px;font-size:.85rem;}
+.hidden{display:none;}
+.status-select{background:var(--bg);border:1px solid rgba(0,180,216,.3);color:#fff;padding:5px 8px;border-radius:6px;font-size:.75rem;}
+.help{font-size:.75rem;color:var(--text-gray);margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2><i class="fa-solid fa-gauge"></i> Lydalin Admin</h2>
+  <div class="nav-item active" data-tab="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
+  <div class="nav-item" data-tab="orders"><i class="fa-solid fa-receipt"></i> Orders</div>
+  <div class="nav-item" data-tab="packages"><i class="fa-solid fa-boxes-stacked"></i> Packages / Stock</div>
+  <div class="nav-item" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</div>
+  <div class="nav-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">Dashboard</h1>
+    <a href="/" target="_blank" class="btn"><i class="fa-solid fa-store"></i> View Store</a>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard">
+    <div class="cards" id="statCards"></div>
+    <div class="panel">
+      <h3>Recent Orders</h3>
+      <div style="overflow-x:auto;"><table id="recentTable"><thead><tr><th>Code</th><th>Game</th><th>Package</th><th>Player</th><th>Amount</th><th>Status</th><th>Created</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div id="tab-orders" class="hidden">
+    <div class="filters">
+      <select id="fStatus"><option value="">All Status</option><option>pending</option><option>scanned</option><option>paid</option><option>delivering</option><option>completed</option><option>failed</option><option>expired</option><option>cancelled</option></select>
+      <select id="fGame"><option value="">All Games</option><option value="mlbb">MLBB</option><option value="freefire">Free Fire</option></select>
+      <input id="fQ" placeholder="Search order code / player id">
+      <button class="btn btn-sm" onclick="loadOrders()">Filter</button>
+    </div>
+    <div style="overflow-x:auto;"><table id="ordersTable"><thead><tr><th>Code</th><th>Source</th><th>Game</th><th>Package</th><th>Player</th><th>Amount</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- PACKAGES -->
+  <div id="tab-packages" class="hidden">
+    <div class="panel">
+      <h3>Add New Package</h3>
+      <div class="form-row">
+        <select id="npGame"><option value="1">MLBB</option><option value="2">Free Fire</option></select>
+        <input id="npName" placeholder="Package name e.g. 500 Diamonds">
+        <input id="npPrice" type="number" step="0.01" placeholder="Sell price ($)">
+        <input id="npCost" type="number" step="0.01" placeholder="Cost price ($)">
+        <input id="npStock" type="number" placeholder="Initial stock">
+        <button class="btn" onclick="addPackage()">Add</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;"><table id="packagesTable"><thead><tr><th>Game</th><th>Package</th><th>Price</th><th>Cost</th><th>Stock</th><th>Active</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="hidden">
+    <div class="panel">
+      <h3><i class="fa-solid fa-shop"></i> Shop & KHQR (Bakong)</h3>
+      <div class="form-row"><input id="sShopName" placeholder="Shop name"></div>
+      <div class="form-row">
+        <input id="sBakongId" placeholder="Bakong account id (e.g. name@devb)">
+        <input id="sMerchantName" placeholder="Merchant name shown on QR">
+        <input id="sMerchantCity" placeholder="Merchant city">
+      </div>
+      <div class="form-row"><input id="sBakongToken" placeholder="Bakong Open API token (for auto payment verification)"></div>
+      <p class="help">Get a free developer token at <a href="https://api-bakong.nbc.gov.kh" target="_blank" style="color:var(--accent);">api-bakong.nbc.gov.kh</a>. Without it, KHQR codes still work — you'll just confirm payments manually here or via Telegram.</p>
+      <button class="btn" style="margin-top:10px;" onclick="saveSettings()">Save Settings</button>
+    </div>
+
+    <div class="panel">
+      <h3><i class="fa-brands fa-telegram"></i> Telegram Bot</h3>
+      <div class="form-row"><input id="sTgToken" placeholder="Telegram Bot Token (from @BotFather)"></div>
+      <div class="form-row"><input id="sTgChat" placeholder="Admin group/channel chat id (orders forwarded here)"></div>
+      <p class="help">1) Create a bot with @BotFather, paste its token above. 2) Add the bot to your admin group, send any message, then use a "get chat id" bot or the getUpdates API to find the chat id. 3) Save, then click restart bot.</p>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn" onclick="saveSettings()">Save Settings</button>
+        <button class="btn btn-green" onclick="restartBot()">Restart Bot</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3><i class="fa-solid fa-key"></i> Change Password</h3>
+      <div class="form-row"><input id="newPass" type="password" placeholder="New password (min 6 chars)"></div>
+      <button class="btn" onclick="changePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/app.js"></script>
+</body>
+</html>
