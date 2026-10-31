@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lydalin Topup - Game Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="logo-group">
+      <div class="avatar-img">LT</div>
+      <div class="brand-name"><h2 id="shopName">Lydalin Topup</h2><span>GAME STORE</span></div>
+    </div>
+    <button class="menu-btn" id="openMenuBtn"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="side-menu">
+    <div class="side-menu-header">
+      <span class="side-menu-title"><i class="fa-solid fa-compass" style="color:var(--accent-blue);"></i> ម៉ឺនុយ</span>
+      <i class="fa-solid fa-xmark close-menu" id="closeMenuBtn"></i>
+    </div>
+    <div class="menu-item" onclick="document.getElementById('gameSection').scrollIntoView({behavior:'smooth'})">
+      <i class="fa-solid fa-gamepad" style="color:var(--bright-blue);"></i><span>Game Topup</span>
+    </div>
+    <a href="https://t.me/" target="_blank" class="menu-item">
+      <i class="fa-brands fa-telegram" style="color:#0088cc;"></i><span>Telegram Admin</span>
+    </a>
+    <a href="/admin/" class="menu-item">
+      <i class="fa-solid fa-lock" style="color:var(--accent-blue);"></i><span>Admin Panel</span>
+    </a>
+    <div class="menu-item" onclick="openTermsModal()">
+      <i class="fa-solid fa-file-contract" style="color:var(--accent-blue);"></i><span>Terms & Service</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="banner-wrapper">
+    <h1>🎮 Lydalin Topup</h1>
+    <p>ចាក់ទឹកប្រាក់ Diamonds លឿន សុវត្ថិភាព ២៤/៧ | Instant KHQR auto-payment</p>
+  </div>
+
+  <div class="section-header" id="gameSection">
+    <span class="fire-icon"><i class="fa-solid fa-fire"></i></span>
+    <span>ហ្គេមពេញនិយម (Game Topup)</span>
+  </div>
+
+  <div class="game-grid" id="gameGrid">
+    <!-- injected by JS -->
+  </div>
+</div>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-brand">
+      <h3>Lydalin Topup</h3>
+      <p>សេវាកម្មបញ្ជូលហ្គេមរហ័សទាន់ចិត្ត ទំនុកចិត្ត 100% និងមានសុវត្ថិភាពខ្ពស់។</p>
+    </div>
+    <div>
+      <div class="payment-title">វិធីសាស្ត្រទូទាត់ប្រាក់</div>
+      <div class="payment-grid">
+        <div class="pay-card"><i class="fa-solid fa-qrcode"></i> Bakong KHQR</div>
+      </div>
+    </div>
+    <div class="footer-links">
+      <span onclick="document.getElementById('gameSection').scrollIntoView({behavior:'smooth'})">Game Topup</span> •
+      <a href="https://t.me/" target="_blank">Telegram</a> •
+      <span onclick="openTermsModal()">Terms & Service</span> •
+      <a href="/admin/">Admin</a>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Lydalin Topup. All rights reserved.</div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="termsModal">
+  <div class="modal-box">
+    <div class="modal-header"><h3><i class="fa-solid fa-shield-halved"></i> Terms & Service</h3>
+      <i class="fa-solid fa-xmark close-menu" onclick="closeTermsModal()"></i></div>
+    <div class="modal-body">
+      <p>សូមពិនិត្យមើល Player ID និង Zone ID របស់អ្នកឱ្យបានត្រឹមត្រូវមុនពេលទូទាត់ប្រាក់។ ប្រព័ន្ធដំណើរការស្វ័យប្រវត្តិចន្លោះពី ១-៥ នាទីបន្ទាប់ពីទូទាត់ជោគជ័យ។</p>
+    </div>
+    <div class="modal-footer"><button class="btn-close-modal" onclick="closeTermsModal()">យល់ព្រម</button></div>
+  </div>
+</div>
+
+<script>
+const openMenuBtn=document.getElementById('openMenuBtn'), closeMenuBtn=document.getElementById('closeMenuBtn'), menuOverlay=document.getElementById('menuOverlay'), termsModal=document.getElementById('termsModal');
+openMenuBtn.onclick=()=>menuOverlay.classList.add('active');
+closeMenuBtn.onclick=()=>menuOverlay.classList.remove('active');
+menuOverlay.onclick=(e)=>{ if(e.target===menuOverlay) menuOverlay.classList.remove('active'); };
+function openTermsModal(){ menuOverlay.classList.remove('active'); termsModal.classList.add('active'); }
+function closeTermsModal(){ termsModal.classList.remove('active'); }
+termsModal.onclick=(e)=>{ if(e.target===termsModal) closeTermsModal(); };
+
+const ICONS = { mlbb: 'fa-solid fa-gem', freefire: 'fa-solid fa-fire' };
+
+async function loadGames(){
+  try{
+    const res = await fetch('/api/games');
+    const data = await res.json();
+    const grid = document.getElementById('gameGrid');
+    grid.innerHTML = data.games.map(g => `
+      <div class="game-card" onclick="location.href='/${g.code}.html'">
+        <span class="badge-hot">HOT</span>
+        <div class="game-thumb"><i class="${ICONS[g.code] || 'fa-solid fa-gamepad'}"></i></div>
+        <div class="game-title">${g.name}</div>
+        <button class="btn-topup">TOPUP</button>
+      </div>`).join('');
+  }catch(e){ console.error(e); }
+}
+loadGames();
+</script>
+</body>
+</html>
