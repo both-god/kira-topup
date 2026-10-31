@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - Lydalin Topup</title>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#0b132b;--card:#1c2541;--accent:#00b4d8;--bright:#0077b6;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Kantumruy Pro',sans-serif;}
+body{background:var(--bg);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.box{background:var(--card);border:1px solid rgba(0,180,216,.3);border-radius:16px;padding:2rem;width:100%;max-width:360px;box-shadow:0 8px 30px rgba(0,0,0,.4);}
+h1{font-size:1.3rem;margin-bottom:.3rem;text-align:center;}
+p.sub{text-align:center;color:#94a3b8;font-size:.8rem;margin-bottom:1.5rem;}
+input{width:100%;background:var(--bg);border:1.5px solid rgba(0,180,216,.3);color:#fff;padding:12px;border-radius:10px;margin-bottom:12px;font-size:.95rem;}
+input:focus{outline:none;border-color:var(--accent);}
+button{width:100%;background:linear-gradient(135deg,var(--bright),var(--accent));border:none;color:#fff;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;}
+.err{color:#ef4444;font-size:.8rem;margin-bottom:10px;display:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1><i class="fa-solid fa-lock" style="color:var(--accent);"></i> Admin Panel</h1>
+  <p class="sub">Lydalin Topup — Sign in</p>
+  <div class="err" id="err"></div>
+  <input id="username" placeholder="Username" autocomplete="username">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <button onclick="doLogin()">Sign In</button>
+</div>
+<script>
+if (localStorage.getItem('admin_token')) location.href = '/admin/';
+async function doLogin(){
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('err');
+  err.style.display = 'none';
+  try{
+    const res = await fetch('/admin/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username,password}) });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    localStorage.setItem('admin_token', data.token);
+    localStorage.setItem('admin_user', JSON.stringify(data.admin));
+    location.href = '/admin/';
+  }catch(e){
+    err.innerText = e.message;
+    err.style.display = 'block';
+  }
+}
+document.getElementById('password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
