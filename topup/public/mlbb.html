@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Legends Topup - Lydalin Topup</title>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="logo-group">
+      <a href="/" class="avatar-img" style="text-decoration:none;">LT</a>
+      <div class="brand-name"><h2>Lydalin Topup</h2><span>MOBILE LEGENDS</span></div>
+    </div>
+    <button class="menu-btn" id="openMenuBtn"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="side-menu">
+    <div class="side-menu-header"><span class="side-menu-title">ម៉ឺនុយ</span><i class="fa-solid fa-xmark close-menu" id="closeMenuBtn"></i></div>
+    <a href="/" class="menu-item"><i class="fa-solid fa-house" style="color:var(--bright-blue);"></i><span>Home</span></a>
+    <div class="menu-item" onclick="openTermsModal()"><i class="fa-solid fa-file-contract" style="color:var(--accent-blue);"></i><span>Terms & Service</span></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="game-info-box">
+    <div class="game-info-icon"><i class="fa-solid fa-gem"></i></div>
+    <div><h3>Mobile Legends: Bang Bang</h3><p style="font-size:.8rem;color:var(--text-gray);">Diamonds ចូលភ្លាមៗ ១-៥ នាទី</p></div>
+  </div>
+
+  <div class="step-title"><i class="fa-solid fa-1" style="color:var(--accent-blue);"></i> បញ្ចូល Player ID</div>
+  <div class="id-input-group">
+    <input type="text" class="input-box" id="playerId" placeholder="Player ID">
+    <input type="text" class="input-box" id="zoneId" placeholder="Zone ID">
+  </div>
+
+  <div class="step-title"><i class="fa-solid fa-2" style="color:var(--accent-blue);"></i> ជ្រើសរើសកញ្ចប់ Diamonds</div>
+  <div class="package-grid" id="packageGrid"></div>
+
+  <div class="step-title"><i class="fa-solid fa-3" style="color:var(--accent-blue);"></i> វិធីទូទាត់ប្រាក់</div>
+  <div class="payment-box" id="khqrPaymentBox" onclick="selectPaymentMethod()">
+    <input type="radio" class="payment-radio" id="khqrRadio">
+    <i class="fa-solid fa-qrcode" style="font-size:1.4rem;color:var(--accent-blue);"></i>
+    <div><strong>Bakong KHQR</strong><div style="font-size:.75rem;color:var(--text-gray);">ស្កេនតាមកម្មវិធីធនាគារណាមួយ</div></div>
+  </div>
+
+  <div class="summary-box">
+    <div class="summary-row"><span>Player ID:</span><span id="sumPlayerId">-</span></div>
+    <div class="summary-row"><span>Zone ID:</span><span id="sumZoneId">-</span></div>
+    <div class="summary-row"><span>កញ្ចប់:</span><span id="sumProduct">-</span></div>
+    <div class="summary-row"><span>តម្លៃសរុប:</span><span id="sumPrice">$0.00</span></div>
+  </div>
+
+  <label class="agree-checkbox"><input type="checkbox" id="agreeTerms"> ខ្ញុំយល់ព្រមតាម <span style="color:var(--accent-blue);cursor:pointer;" onclick="openTermsModal()">លក្ខខណ្ឌសេវាកម្ម</span></label>
+
+  <button class="btn-pay" id="payBtn" onclick="processTopup()">ទូទាត់ប្រាក់ឥឡូវ</button>
+</div>
+
+<div class="modal-overlay" id="termsModal">
+  <div class="modal-box">
+    <div class="modal-header"><h3>Terms & Service</h3><i class="fa-solid fa-xmark close-menu" onclick="closeTermsModal()"></i></div>
+    <div class="modal-body"><p>សូមពិនិត្យមើល Player ID និង Zone ID របស់អ្នកឱ្យបានត្រឹមត្រូវមុនពេលទូទាត់ប្រាក់។ ដាក់ខុសហាងមិនទទួលខុសត្រូវទេ។</p></div>
+    <div class="modal-footer"><button class="btn-close-modal" onclick="closeTermsModal()">យល់ព្រម</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="qrModal">
+  <div class="modal-box">
+    <div class="modal-header"><h3><i class="fa-solid fa-qrcode"></i> ស្កេនដើម្បីទូទាត់</h3><i class="fa-solid fa-xmark close-menu" onclick="closeQrModal()"></i></div>
+    <div class="modal-body" style="text-align:center;">
+      <div class="qr-frame"><img id="qrImg" alt="KHQR"></div>
+      <h3 id="qrAmount" style="color:#fff;margin-bottom:4px;">$0.00</h3>
+      <p style="font-size:.8rem;margin-bottom:10px;" id="qrProduct">-</p>
+      <p style="font-size:.75rem;color:var(--text-gray);margin-bottom:10px;">Order: <span id="qrOrderCode">-</span></p>
+      <div class="status-badge status-pending" id="statusBadge"><i class="fa-regular fa-clock"></i><span>pending</span></div>
+      <p style="font-size:.75rem;color:var(--text-gray);margin-top:14px;">ស្ថានភាពនឹងផ្លាស់ប្តូរដោយស្វ័យប្រវត្តិបន្ទាប់ពីទូទាត់ជោគជ័យ។</p>
+    </div>
+    <div class="modal-footer"><button class="btn-close-modal" style="background:#ef4444;" onclick="closeQrModal()">បិទ</button></div>
+  </div>
+</div>
+
+<script>
+const GAME_CODE = 'mlbb';
+const NEEDS_ZONE = true;
+</script>
+<script src="/game.js"></script>
+</body>
+</html>
